@@ -1,0 +1,103 @@
+<html>
+	<head>
+		<!--
+			tutorial
+		-->
+		<title>
+			Example Demo
+		</title>
+	</head>
+	<body style="overflow:hidden;">
+		<center>
+			<!--
+				demo
+			-->
+			<canvas style="border: double 10px black; margin: 0" oncontextmenu="return false;" style="padding:-1px;margin:-1px">
+				You so old, this dont work no more!
+			</canvas>
+			<br/>
+			Size: <input onchange="setVar('size', this.value)" style="width:10%;" type="range" min=2 max=64 range=62;></input>
+			<br/>
+			Colour: <input style="width:10%;" type="color" id="c"></input>
+		</center>
+		<script>
+			var c = document.getElementsByTagName("canvas")[0];
+			var ctx = c.getContext("2d");
+			c.width = window.innerWidth*0.975;
+			c.height= window.innerHeight*0.8;
+			var size = 32;
+			var md = false;
+			function mouseA(e){
+				e.preventDefault();
+				ctx.beginPath();
+				if(e.button==0) {
+					//LeftClick
+					md=1;
+					ctx.fillStyle=document.getElementById("c").value;
+					ctx.strokeStyle=ctx.fillStyle;
+				} else {
+					md=-1;
+					ctx.fillStyle="white";
+					ctx.strokeStyle=ctx.fillStyle;
+				};
+				ctx.beginPath(e.pageX-size/2,e.pageY-size/2,size,size); 
+				ctx.fillRect(e.pageX-size/1.5,e.pageY-size/2,size,size); 
+			};
+			function mouseB(e){
+				e.preventDefault();
+				if(md>0) ctx.fillRect(e.pageX-size/1.5,e.pageY-size/2,size,size); 
+				if(md<0) ctx.fillRect(e.pageX-size/2,e.pageY-size/3,size/3*2,size/3*2); 
+			};
+			function mouseC(e){
+				e.preventDefault();
+				ctx.closePath();
+				md = 0;
+			};
+			
+			var shapes = [];
+			function Shape(x,co){
+				this.x = x||-174; this.y = -10;
+				this.vel = {x: 1.75, y: 0};
+				this.color = co||document.getElementById("c").value;
+				this.upd = function() {
+					this.x+=this.vel.x;
+					this.vel.y+=0.4;
+					if(this.y>c.height*0.95){this.vel.y*=-1};
+					this.y+=this.vel.y;
+					if(this.x>c.width*2){shapes.splice(this);}
+				};
+				this.show = function(){
+					ctx.fillStyle=this.color;
+					ctx.fillRect(this.x,this.y,384,64);
+				}
+			}
+			function keyPress(e){
+				if(e.keyCode==68){
+					e.preventDefault();
+					shapes.push(new Shape());
+					shapes.push(new Shape(-500, "white"));
+				}
+			}
+			window.onkeydown=keyPress;
+			function Tick(){
+				for(var s =0; s < shapes.length; s++){
+					shapes[s].upd();
+					shapes[s].show();
+				}
+				setTimeout(Tick, 1000/120);
+			}
+			Tick();
+			
+			c.onmousedown=mouseA;
+			c.onmousemove=mouseB;
+			c.onmouseup=mouseC;
+			concontextmenu = function (e) {
+				e.preventDefault();
+			};
+
+			function setVar(a,b){
+				eval(a+"="+b);
+			};
+		</script>
+	</body>
+</html>
